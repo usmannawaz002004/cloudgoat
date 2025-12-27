@@ -1,10 +1,10 @@
-# Scenario: beanstalk_secrets
+# Scenario: codebuild_privesc
 
 **Size:** Medium
 
 **Difficulty:** Moderate
 
-**Command:** `./cloudgoat.py create beanstalk_secrets`
+**Command:** `./cloudgoat.py create codebuild_privesc`
 
 ## Scenario Resources
 
